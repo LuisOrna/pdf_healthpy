@@ -1,0 +1,13 @@
+# Credentials & secrets
+*.json
+.env
+
+# Client data & forms (PII)
+*.pdf
+
+# Project instructions
+CLAUDE.md
+
+# Python
+__pycache__/
+venv/
