@@ -1,7 +1,6 @@
 from google.cloud import documentai
 import os
 
-os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = "pdf2-488718-0bc3349786f4.json"
 
 def get_document(image_path):
     client = documentai.DocumentProcessorServiceClient()

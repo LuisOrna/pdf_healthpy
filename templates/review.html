@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Asismed - Revisar Datos</title>
+    <style>
+        body { font-family: Arial, sans-serif; max-width: 500px; margin: 60px auto; padding: 0 20px; }
+        h1 { font-size: 1.4rem; margin-bottom: 8px; }
+        p { color: #555; margin-bottom: 24px; }
+        label { display: block; margin-top: 14px; font-size: 0.9rem; color: #333; }
+        input[type="text"] { width: 100%; padding: 8px; margin-top: 4px; border: 1px solid #ccc; border-radius: 4px; font-size: 1rem; box-sizing: border-box; }
+        button { margin-top: 24px; background: #1a73e8; color: white; border: none; padding: 10px 24px; border-radius: 4px; cursor: pointer; font-size: 1rem; }
+        button:hover { background: #1558b0; }
+    </style>
+</head>
+<body>
+    <h1>Revisar datos del cliente</h1>
+    <p>Verifica y corrige los datos antes de generar el formulario.</p>
+    <form action="/generate" method="post">
+        <label>Nombres
+            <input type="text" name="nombres" value="{{ data.get('nombres', '') }}">
+        </label>
+        <label>Apellidos
+            <input type="text" name="apellidos" value="{{ data.get('apellidos', '') }}">
+        </label>
+        <label>Numero de cedula
+            <input type="text" name="numero" value="{{ data.get('numero', '') }}">
+        </label>
+        <label>Fecha de nacimiento (DD-MM-YYYY)
+            <input type="text" name="nacimiento" value="{{ data.get('nacimiento', '') }}">
+        </label>
+        <label>Sexo (M / F)
+            <input type="text" name="sexo" value="{{ data.get('sexo', '') }}">
+        </label>
+        <label>Plan
+            <input type="text" name="plan" value="{{ data.get('plan', '') }}">
+        </label>
+        <button type="submit">Generar formulario PDF</button>
+    </form>
+</body>
+</html>
