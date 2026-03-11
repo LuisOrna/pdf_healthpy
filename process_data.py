@@ -45,20 +45,3 @@ def process(verified_data):
         "year":      year_hoy,
         "Plan":      verified_data["plan"]
     }
-
-
-# Test
-if __name__ == "__main__":
-    from extract_id import get_document, extract_entities
-    from review_data import review_and_complete
-
-    document = get_document("WhatsApp Image 2026-02-28 at 11.25.49.jpeg")
-    entities = extract_entities(document)
-    verified_data = review_and_complete(entities)
-    processed = process(verified_data)
-
-    print("\n--- Processed data ---")
-    for key, value in processed.items():
-        print(f"{key}: {value}")
-
-

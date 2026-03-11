@@ -30,8 +30,3 @@ def extract_entities(document):
     return entities
 
 
-# Test
-if __name__ == "__main__":
-    document = get_document("WhatsApp Image 2026-02-28 at 11.25.49.jpeg")
-    entities = extract_entities(document)
-    print(entities)
