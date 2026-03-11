@@ -14,6 +14,11 @@ def calculate_age(nacimiento):
     return str(age)
 
 
+def get_form_type(nacimiento):
+    age = int(calculate_age(nacimiento))
+    return "djs_m" if age < 18 else "djs_a"
+
+
 def split_birth_date(nacimiento):
     day, month, year = nacimiento.split("-")
     return day, month, year

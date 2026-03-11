@@ -11,31 +11,51 @@
         input[type="text"] { width: 100%; padding: 8px; margin-top: 4px; border: 1px solid #ccc; border-radius: 4px; font-size: 1rem; box-sizing: border-box; }
         button { margin-top: 24px; background: #1a73e8; color: white; border: none; padding: 10px 24px; border-radius: 4px; cursor: pointer; font-size: 1rem; }
         button:hover { background: #1558b0; }
+        .plan-line { margin-bottom: 28px; font-size: 1rem; color: #333; }
+        .card { border: 1px solid #ddd; border-radius: 8px; padding: 20px; margin-bottom: 24px; }
+        .card-header { display: flex; align-items: center; gap: 12px; margin-bottom: 4px; }
+        .card-header h2 { font-size: 1.1rem; margin: 0; }
+        .badge { font-size: 0.75rem; font-weight: bold; padding: 3px 8px; border-radius: 12px; color: white; }
+        .badge-adulto { background: #1a73e8; }
+        .badge-menor { background: #e8710a; }
     </style>
 </head>
 <body>
     <h1>Revisar datos del cliente</h1>
-    <p>Verifica y corrige los datos antes de generar el formulario.</p>
-    <form action="/generate" method="post">
-        <label>Nombres
-            <input type="text" name="nombres" value="{{ data.get('nombres', '') }}">
-        </label>
-        <label>Apellidos
-            <input type="text" name="apellidos" value="{{ data.get('apellidos', '') }}">
-        </label>
-        <label>Numero de cedula
-            <input type="text" name="numero" value="{{ data.get('numero', '') }}">
-        </label>
-        <label>Fecha de nacimiento (DD-MM-YYYY)
-            <input type="text" name="nacimiento" value="{{ data.get('nacimiento', '') }}">
-        </label>
-        <label>Sexo (M / F)
-            <input type="text" name="sexo" value="{{ data.get('sexo', '') }}">
-        </label>
-        <label>Plan
-            <input type="text" name="plan" value="{{ data.get('plan', '') }}">
-        </label>
-        <button type="submit">Generar formulario PDF</button>
-    </form>
+    <p>Verifica y corrige los datos antes de generar los formularios.</p>
+
+    <div class="plan-line"><strong>Plan:</strong> {{ plan }}</div>
+
+    {% for member in members %}
+    <div class="card">
+        <div class="card-header">
+            <h2>{{ member.role | capitalize }}</h2>
+            {% if member.form_type == "djs_a" %}
+                <span class="badge badge-adulto">ADULTO</span>
+            {% else %}
+                <span class="badge badge-menor">MENOR</span>
+            {% endif %}
+        </div>
+        <form action="/generate" method="post">
+            <input type="hidden" name="member_index" value="{{ loop.index0 }}">
+            <label>Nombres
+                <input type="text" name="nombres" value="{{ member.get('nombres', '') }}">
+            </label>
+            <label>Apellidos
+                <input type="text" name="apellidos" value="{{ member.get('apellidos', '') }}">
+            </label>
+            <label>Numero de cedula
+                <input type="text" name="numero" value="{{ member.get('numero', '') }}">
+            </label>
+            <label>Fecha de nacimiento (DD-MM-YYYY)
+                <input type="text" name="nacimiento" value="{{ member.get('nacimiento', '') }}">
+            </label>
+            <label>Sexo (M / F)
+                <input type="text" name="sexo" value="{{ member.get('sexo', '') }}">
+            </label>
+            <button type="submit">Generar PDF</button>
+        </form>
+    </div>
+    {% endfor %}
 </body>
 </html>

@@ -10,14 +10,88 @@
         input[type="file"] { display: block; margin-bottom: 16px; }
         button { background: #1a73e8; color: white; border: none; padding: 10px 24px; border-radius: 4px; cursor: pointer; font-size: 1rem; }
         button:hover { background: #1558b0; }
+        .section-label { font-weight: bold; margin-bottom: 8px; display: block; }
+        .section { margin-bottom: 24px; }
+        input[type="text"] { display: block; width: 100%; box-sizing: border-box; padding: 8px; margin-bottom: 16px; border: 1px solid #ccc; border-radius: 4px; font-size: 1rem; }
+        .dependiente-block { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; }
+        .dependiente-block input[type="file"] { margin-bottom: 0; flex: 1; }
+        .btn-remove { background: #d93025; padding: 6px 12px; font-size: 0.9rem; }
+        .btn-remove:hover { background: #a50e0e; }
+        .btn-add { background: #188038; margin-top: 8px; padding: 7px 16px; font-size: 0.9rem; }
+        .btn-add:hover { background: #0d652d; }
     </style>
 </head>
 <body>
     <h1>Cargar foto de cedula</h1>
     <p>Sube la foto de la cedula del cliente para extraer los datos automaticamente.</p>
     <form action="/upload" method="post" enctype="multipart/form-data">
-        <input type="file" name="photo" accept=".jpg,.jpeg,.png" required>
+
+        <!-- Plan -->
+        <div class="section">
+            <label class="section-label" for="plan">Plan</label>
+            <input type="text" id="plan" name="plan" placeholder="Ej: Vip Plus Superior">
+        </div>
+
+        <!-- Titular -->
+        <div class="section">
+            <span class="section-label">Titular</span>
+            <input type="file" name="photo" accept=".jpg,.jpeg,.png" required>
+        </div>
+
+        <!-- Cónyuge -->
+        <div id="conyuge-section" class="section">
+            <span class="section-label">Cónyuge</span>
+            <input type="file" name="conyuge_foto" accept=".jpg,.jpeg,.png">
+        </div>
+
+        <!-- Dependientes -->
+        <div class="section">
+            <span class="section-label">Dependientes</span>
+            <div id="dependientes-container"></div>
+            <button type="button" class="btn-add" id="btn-agregar">+ Agregar Dependiente</button>
+        </div>
+
         <button type="submit">Extraer datos</button>
     </form>
+
+    <script>
+        const container = document.getElementById('dependientes-container');
+        const btnAgregar = document.getElementById('btn-agregar');
+        const MAX = 5;
+
+        function reindex() {
+            const blocks = container.querySelectorAll('.dependiente-block');
+            blocks.forEach((block, i) => {
+                block.querySelector('input[type="file"]').name = 'dependiente_foto_' + i;
+            });
+            btnAgregar.style.display = blocks.length >= MAX ? 'none' : '';
+        }
+
+        btnAgregar.addEventListener('click', function () {
+            const blocks = container.querySelectorAll('.dependiente-block');
+            if (blocks.length >= MAX) return;
+
+            const div = document.createElement('div');
+            div.className = 'dependiente-block';
+
+            const input = document.createElement('input');
+            input.type = 'file';
+            input.accept = '.jpg,.jpeg,.png';
+
+            const btnRemove = document.createElement('button');
+            btnRemove.type = 'button';
+            btnRemove.className = 'btn-remove';
+            btnRemove.textContent = '✕';
+            btnRemove.addEventListener('click', function () {
+                div.remove();
+                reindex();
+            });
+
+            div.appendChild(input);
+            div.appendChild(btnRemove);
+            container.appendChild(div);
+            reindex();
+        });
+    </script>
 </body>
 </html>
