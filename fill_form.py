@@ -1,5 +1,8 @@
+import os
 import pypdf
 from pypdf.generic import RectangleObject, NameObject
+
+_HERE = os.path.dirname(os.path.abspath(__file__))
 
 
 def _resolve_indirect_rects(writer):
@@ -41,7 +44,7 @@ def fill_pdf(processed_data, form_type, titular, output_pdf):
       djs_m: titular = plan holder's name, menor = minor's full name,
              cedula_titular = plan holder's CI
     """
-    template = form_type + ".pdf"
+    template = os.path.join(_HERE, form_type + ".pdf")
 
     if form_type == "djs_a":
         fields = dict(processed_data)

@@ -1,5 +1,8 @@
+import os
 import pypdf
 from pypdf.generic import RectangleObject, NameObject
+
+_HERE = os.path.dirname(os.path.abspath(__file__))
 
 
 def _resolve_indirect_rects(writer):
@@ -37,7 +40,7 @@ def fill_anexo(titular_nombre, cedula, plan, output_pdf):
         "Plan":    plan,
     }
 
-    reader = pypdf.PdfReader("anexo.pdf")
+    reader = pypdf.PdfReader(os.path.join(_HERE, "anexo.pdf"))
     writer = pypdf.PdfWriter()
     writer.append(reader)
     _resolve_indirect_rects(writer)
