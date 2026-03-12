@@ -1,7 +1,7 @@
 import os
 import tempfile
 
-ALLOWED_EXTENSIONS = {"jpg", "jpeg", "png"}
+ALLOWED_EXTENSIONS = {"jpg", "jpeg", "png", "pdf"}
 
 
 def validate_and_save(file):
