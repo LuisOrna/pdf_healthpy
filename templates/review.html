@@ -25,6 +25,8 @@
         .add-buttons { display: flex; gap: 12px; margin-top: 8px; margin-bottom: 32px; }
         .btn-add-member { background: #188038; color: white; border: none; padding: 9px 18px; border-radius: 4px; cursor: pointer; font-size: 0.95rem; margin-top: 0; }
         .btn-add-member:hover { background: #0d652d; }
+        .btn-anexo { display: block; width: 100%; margin-top: 8px; background: #6a1b9a; color: white; border: none; padding: 11px 24px; border-radius: 4px; cursor: pointer; font-size: 1rem; text-align: center; }
+        .btn-anexo:hover { background: #4a148c; }
         .btn-reset { display: inline-block; margin-top: 16px; margin-bottom: 40px; color: #c62828; font-size: 0.9rem; text-decoration: none; }
         .btn-reset:hover { text-decoration: underline; }
     </style>
@@ -77,7 +79,7 @@
                     <input type="radio" name="sexo" value="F" {% if sexo_val == 'F' %}checked{% endif %}> Femenino
                 </label>
             </div>
-            <button type="submit">Generar PDF</button>
+            <button type="submit">Generar DJS</button>
         </form>
     </div>
     {% endfor %}
@@ -99,6 +101,10 @@
         </form>
         {% endif %}
     </div>
+
+    <form action="/generate_anexo" method="post">
+        <button type="submit" class="btn-anexo">Generar Anexo</button>
+    </form>
 
     <a href="/reset" class="btn-reset">← Nuevo cliente</a>
 </body>

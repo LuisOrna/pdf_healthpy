@@ -6,6 +6,7 @@ from handle_upload import validate_and_save
 from extract_id import get_document, extract_entities
 from process_data import process, get_form_type
 from fill_form import fill_pdf
+from fill_anexo import fill_anexo
 
 app = Flask(__name__)
 app.secret_key = os.environ.get("SECRET_KEY", "dev-only-key")
@@ -144,6 +145,30 @@ def generate():
         tmp.name,
         as_attachment=True,
         download_name=download_name,
+        mimetype="application/pdf"
+    )
+
+
+@app.route("/generate_anexo", methods=["POST"])
+def generate_anexo():
+    members = session.get("members", [])
+    plan = session.get("plan", "")
+    if not members:
+        return redirect("/")
+
+    t = members[0]
+    titular_nombre = t.get("nombres", "") + " " + t.get("apellidos", "")
+    cedula = t.get("numero", "") or "output"
+
+    tmp = tempfile.NamedTemporaryFile(suffix=".pdf", delete=False)
+    tmp.close()
+
+    fill_anexo(titular_nombre, cedula, plan, tmp.name)
+
+    return send_file(
+        tmp.name,
+        as_attachment=True,
+        download_name=f"{cedula}_anexo.pdf",
         mimetype="application/pdf"
     )
 
