@@ -18,6 +18,15 @@
         .badge { font-size: 0.75rem; font-weight: bold; padding: 3px 8px; border-radius: 12px; color: white; }
         .badge-adulto { background: #1a73e8; }
         .badge-menor { background: #e8710a; }
+        .date-row { display: flex; gap: 6px; align-items: center; margin-top: 4px; }
+        .date-row input { width: 0; flex: 1; min-width: 0; padding: 8px 6px; }
+        .date-row .year-input { flex: 2; }
+        .date-row span { color: #555; font-size: 1rem; flex-shrink: 0; }
+        .add-buttons { display: flex; gap: 12px; margin-top: 8px; margin-bottom: 32px; }
+        .btn-add-member { background: #188038; color: white; border: none; padding: 9px 18px; border-radius: 4px; cursor: pointer; font-size: 0.95rem; margin-top: 0; }
+        .btn-add-member:hover { background: #0d652d; }
+        .btn-reset { display: inline-block; margin-top: 16px; margin-bottom: 40px; color: #c62828; font-size: 0.9rem; text-decoration: none; }
+        .btn-reset:hover { text-decoration: underline; }
     </style>
 </head>
 <body>
@@ -27,6 +36,8 @@
     <div class="plan-line"><strong>Plan:</strong> {{ plan }}</div>
 
     {% for member in members %}
+    {% set nac = member.get('nacimiento', '') %}
+    {% set nac_parts = nac.split('-') if nac.count('-') == 2 else ['', '', ''] %}
     <div class="card">
         <div class="card-header">
             <h2>{{ member.role | capitalize }}</h2>
@@ -47,15 +58,48 @@
             <label>Numero de cedula
                 <input type="text" name="numero" value="{{ member.get('numero', '') }}">
             </label>
-            <label>Fecha de nacimiento (DD-MM-YYYY)
-                <input type="text" name="nacimiento" value="{{ member.get('nacimiento', '') }}">
-            </label>
-            <label>Sexo (M / F)
-                <input type="text" name="sexo" value="{{ member.get('sexo', '') }}">
-            </label>
+            <label>Fecha de nacimiento</label>
+            <div class="date-row">
+                <input type="number" name="dia_nac" min="1" max="31" maxlength="2" placeholder="DD" value="{{ nac_parts[0] }}">
+                <span>/</span>
+                <input type="number" name="mes_nac" min="1" max="12" maxlength="2" placeholder="MM" value="{{ nac_parts[1] }}">
+                <span>/</span>
+                <input type="number" name="año_nac" min="1900" max="2099" maxlength="4" placeholder="YYYY" class="year-input" value="{{ nac_parts[2] }}">
+            </div>
+            {% set sexo_raw = member.get('sexo', '') %}
+            {% set sexo_val = 'M' if sexo_raw[:1]|upper == 'M' else ('F' if sexo_raw[:1]|upper == 'F' else '') %}
+            <label>Sexo</label>
+            <div style="display:flex; gap:16px; margin-top:6px;">
+                <label style="display:flex; align-items:center; gap:6px; margin-top:0; font-size:1rem; color:#333; cursor:pointer;">
+                    <input type="radio" name="sexo" value="M" {% if sexo_val == 'M' %}checked{% endif %}> Masculino
+                </label>
+                <label style="display:flex; align-items:center; gap:6px; margin-top:0; font-size:1rem; color:#333; cursor:pointer;">
+                    <input type="radio" name="sexo" value="F" {% if sexo_val == 'F' %}checked{% endif %}> Femenino
+                </label>
+            </div>
             <button type="submit">Generar PDF</button>
         </form>
     </div>
     {% endfor %}
+
+    {% set conyuge_count = members | selectattr('role', 'equalto', 'conyuge') | list | length %}
+    {% set dependiente_count = members | selectattr('role', 'equalto', 'dependiente') | list | length %}
+
+    <div class="add-buttons">
+        {% if conyuge_count == 0 %}
+        <form action="/add_member" method="post">
+            <input type="hidden" name="role" value="conyuge">
+            <button type="submit" class="btn-add-member">+ Añadir Cónyuge</button>
+        </form>
+        {% endif %}
+        {% if dependiente_count < 5 %}
+        <form action="/add_member" method="post">
+            <input type="hidden" name="role" value="dependiente">
+            <button type="submit" class="btn-add-member">+ Añadir Dependiente</button>
+        </form>
+        {% endif %}
+    </div>
+
+    <a href="/reset" class="btn-reset">← Nuevo cliente</a>
 </body>
 </html>

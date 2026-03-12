@@ -1,6 +1,6 @@
 import os
 import tempfile
-from flask import Flask, render_template, request, send_file, session
+from flask import Flask, render_template, request, send_file, session, redirect
 
 from handle_upload import validate_and_save
 from extract_id import get_document, extract_entities
@@ -14,6 +14,34 @@ app.secret_key = os.environ.get("SECRET_KEY", "dev-only-key")
 @app.route("/")
 def index():
     return render_template("index.html")
+
+
+@app.route("/reset")
+def reset():
+    session.clear()
+    return redirect("/")
+
+
+@app.route("/review")
+def review():
+    members = session.get("members")
+    plan = session.get("plan", "")
+    if not members:
+        return redirect("/")
+    return render_template("review.html", members=members, plan=plan)
+
+
+@app.route("/add_member", methods=["POST"])
+def add_member():
+    role = request.form.get("role")
+    members = session.get("members", [])
+    members.append({
+        "role": role, "form_type": "djs_a",
+        "nombres": "", "apellidos": "", "numero": "",
+        "nacimiento": "", "sexo": "",
+    })
+    session["members"] = members
+    return redirect("/review")
 
 
 @app.route("/upload", methods=["POST"])
@@ -37,11 +65,14 @@ def upload():
         entities = extract_entities(document)
         os.remove(image_path)
 
-        # Titular always uses djs_a; for others determine by age
+        # Titular always uses djs_a; for others determine by age (fall back if date is malformed)
         if role == "titular" or len(members) == 0:
             form_type = "djs_a"
         else:
-            form_type = get_form_type(entities.get("nacimiento", "01-01-2000"))
+            try:
+                form_type = get_form_type(entities.get("nacimiento", ""))
+            except Exception:
+                form_type = "djs_a"
 
         member = {"role": role, "form_type": form_type}
         member.update(entities)
@@ -62,11 +93,17 @@ def generate():
     plan = session.get("plan", "")
     member_index = int(request.form.get("member_index", 0))
 
+    # Reconstruct nacimiento from the 3 split date fields
+    dia = request.form.get("dia_nac", "").zfill(2)
+    mes = request.form.get("mes_nac", "").zfill(2)
+    ano = request.form.get("año_nac", "")
+    nacimiento = f"{dia}-{mes}-{ano}" if dia and mes and ano else ""
+
     verified_data = {
         "nombres":    request.form.get("nombres", ""),
         "apellidos":  request.form.get("apellidos", ""),
         "numero":     request.form.get("numero", ""),
-        "nacimiento": request.form.get("nacimiento", ""),
+        "nacimiento": nacimiento,
         "sexo":       request.form.get("sexo", ""),
         "plan":       plan,
     }
@@ -90,7 +127,10 @@ def generate():
     if member_index == 0:
         form_type = "djs_a"
     else:
-        form_type = get_form_type(verified_data["nacimiento"])
+        try:
+            form_type = get_form_type(verified_data["nacimiento"])
+        except Exception:
+            form_type = "djs_a"
 
     tmp = tempfile.NamedTemporaryFile(suffix=".pdf", delete=False)
     tmp.close()
